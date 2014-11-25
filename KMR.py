@@ -22,14 +22,14 @@ x; number of agents playing action 1.
 (1) Simultenious revisions.
    
 """
-     def KMR_2x2_P_simultaneous(N, p, epsilon):
+def KMR_2x2_P_simultaneous(N, p, epsilon):
           P = np.empty((N+1, N+1), dtype=float)
           for x in range(N+1):
             P[x,:]  = \ # transition probability where current state is x.
-                 (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + 
-                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) +      # Each prob.dist affected by current state.
+                 (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + \ 
+                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) + \      # Each prob.dist affected by current state.
                  (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2)
-         return P
+          return P
       
      
 """           
@@ -38,14 +38,14 @@ I allow each agent to play the game with himself.
       
 """
                 
-      def KMR_2x2_P_sequential(N, p, epsilon):
+def KMR_2x2_P_sequential(N, p, epsilon):
           P = np.zeros((N+1, N+1), dtype=float)
           
-         P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) # transition where current state is x=0.
+          P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) # transition where current state is x=0.
           P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) # transiiton where current state is x=N.
       
-         for x in range(1, N):
-              P[x, x-1] = \ # transiton to one decreased state.
+          for x in range(1, N):
+             P[x, x-1] = \ # transiton to one decreased state.
                   (x/N) * (
                             (x/N >p)*epsilon * (1/2)
                             (x/N == p) * (1/2))
@@ -63,58 +63,57 @@ I allow each agent to play the game with himself.
               
           return P
       
-      class KMR_2x2:
-      
-# Determine dynamics senario; simultenious or sequential
-          def __init__(self, N, p, epsilon, move='simultaneous'):
+class KMR_2x2:
+      # Determine dynamics senario; simultenious or sequential
+   def __init__(self, N, p, epsilon, move='simultaneous'):
               self._epsilon = epsilon
               self.N, self.p, self.move = N, p, move
               self.set_P() # game what to use, simultenious or sequential.
       
-          def get_epsilon(self):
-              return self._epsilon
+   def get_epsilon(self):
+        return self._epsilon
       
-          def set_epsilon(self, new_value):
+   def set_epsilon(self, new_value):
               self._epsilon = new_value
               self.set_P()
       
-          epsilon = property(get_epsilon, set_epsilon)
+    epsilon = property(get_epsilon, set_epsilon)
       
-          def set_P(self): # Command to recognize each senario to use.
-              if self.move == 'sequential':
-                  self.P = KMR_2x2_P_sequential(self.N, self.p, self._epsilon)
-              else:
-                  self.P = KMR_2x2_P_simultaneous(self.N, self.p, self._epsilon)
+    def set_P(self): # Command to recognize each senario to use.
+        if self.move == 'sequential':
+            self.P = KMR_2x2_P_sequential(self.N, self.p, self._epsilon)
+        else:
+            self.P = KMR_2x2_P_simultaneous(self.N, self.p, self._epsilon)
                   
       #Simulation code
       
-          def simulate(self, T=100000, x0=0):
+    def simulate(self, T=100000, x0=0):
              
-            """
-              Generates a NumPy array containing a sample path of length T
-              with initial state x0 = 0
-              
-            """
-              self.s = mc_sample_path(self.P, x0, T)
+  """
+  Generates a NumPy array containing a sample path of length T
+  with initial state x0 = 0
+  
+  """
+  self.s = mc_sample_path(self.P, x0, T)
       
-          def get_sample_path(self):
-              return self.s
+    def get_sample_path(self):
+        return self.s
       
       #Plot a sample path\n",
       
-          def plot_sample_path(self, ax=None, show=True):
-              if show:
+    def plot_sample_path(self, ax=None, show=True):
+        if show:
                   fig, ax = plt.subplots()
               ax.plot(self.s, alpha=0.5)
               ax.set_ylim(0, self.N)
               ax.set_title(r'Sample path: $\\varepsilon = {0}$'.format(self._epsilon))
               ax.set_xlabel('time')
               ax.set_ylabel('state space')
-              if show:
+        if show:
                   plt.show()
       
-          def plot_emprical_dist(self, ax=None, show=True):
-              if show:
+    def plot_emprical_dist(self, ax=None, show=True):
+         if show:
                   fig, ax = plt.subplots()
               hist, bins = np.histogram(self.s, self.N+1)
               ax.bar(range(self.N+1), hist, align='center')
@@ -122,7 +121,7 @@ I allow each agent to play the game with himself.
               ax.set_xlim(-0.5, self.N+0.5)
               ax.set_xlabel('state space')
               ax.set_ylabel('frequency')
-              if show:
+        Å@if show:
                   plt.show()
       
       # Compute a stationary distribution\n",
