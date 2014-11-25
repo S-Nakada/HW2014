@@ -4,24 +4,24 @@ from scipy.stats import binom
 import matplotlib.pyplot as plt
 from mc_tools import mc_compute_stationary, mc_sample_path
       
-    """
-      This file is based on D.Oyama's class file, KMR_2x2.
+"""
+This file is based on D.Oyama's class file, KMR_2x2.
       
-    """
+"""
     
-    """
-    Parameters for KMR game.
+"""
+Parameters for KMR game.
       
-      N; number of players.
-      p; number of threshhold to take an action 1 for best response.
-      epsilon; probability of random choice (experiment, mutation).
-      x; number of agents playing action 1.
-    """
+N; number of players.
+p; number of threshhold to take an action 1 for best response.
+epsilon; probability of random choice (experiment, mutation).
+x; number of agents playing action 1.
+"""
     
-    """
-      (1) Simultenious revisions.
-      
-    """
+"""
+(1) Simultenious revisions.
+   
+"""
      def KMR_2x2_P_simultaneous(N, p, epsilon):
           P = np.empty((N+1, N+1), dtype=float)
           for x in range(N+1):
@@ -32,11 +32,11 @@ from mc_tools import mc_compute_stationary, mc_sample_path
          return P
       
      
-    """           
-      (2) Sequential revisions
-      I allow each agent to play the game with himself.
+"""           
+(2) Sequential revisions
+I allow each agent to play the game with himself.
       
-    """
+"""
                 
       def KMR_2x2_P_sequential(N, p, epsilon):
           P = np.zeros((N+1, N+1), dtype=float)
