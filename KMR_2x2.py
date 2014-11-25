@@ -1,163 +1,188 @@
-
-      from __future__ import division
-      import numpy as np
-      from scipy.stats import binom
-      import matplotlib.pyplot as plt
-      from mc_tools import mc_compute_stationary, mc_sample_path
-      
-    """
-      This file is based on D.Oyama's class file, KMR_2x2.
-      
-    """
-    
-    """
-    Parameters for KMR game.
-      
-      N; number of players.
-      p; number of threshhold to take an action 1 for best response.
-      epsilon; probability of random choice (experiment, mutation).
-      x; number of agents playing action 1.
-    """
-    
-    """
-      (1) Simultenious revisions.
-      
-    """
-     def KMR_2x2_P_simultaneous(N, p, epsilon):
-          P = np.empty((N+1, N+1), dtype=float)
-          for x in range(N+1):
-            P[x,:]  = \ # transition probability where current state is x.
-                 (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + 
-                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) +      # Each prob.dist affected by current state.
-                 (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2)
-         return P
-      
-     
-    """           
-      (2) Sequential revisions
-      I allow each agent to play the game with himself.
-      
-    """
-                
-      def KMR_2x2_P_sequential(N, p, epsilon):
-          P = np.zeros((N+1, N+1), dtype=float)
-          
-         P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) # transition where current state is x=0.
-          P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) # transiiton where current state is x=N.
-      
-         for x in range(1, N):
-              P[x, x-1] = \ # transiton to one decreased state.
-                  (x/N) * (
-                            (x/N >p)*epsilon * (1/2)
-                            (x/N == p) * (1/2))
-                            (x/N < p)*(1 - epsilon*(1/2))
-                           )
-              
-              P[x, x+1] = \ #transition to one increased state.
-                  (1-(x/N)) * (
-                                (x/N >p)*(1 - epsilon*(1/2))
-                                (x/N == p) * (1/2))
-                                (x/N < p)*epsilon * (1/2)
-                               )
-                  
-              P[x, x] = 1 - P[x, x-1] - P[x, x+1] #transition to be remained current state.
-              
-          return P
-      
-      class KMR_2x2:
-      
-# Determine dynamics senario; simultenious or sequential
-          def __init__(self, N, p, epsilon, move='simultaneous'):
-              self._epsilon = epsilon
-              self.N, self.p, self.move = N, p, move
-              self.set_P() # game what to use, simultenious or sequential.
-      
-          def get_epsilon(self):
-              return self._epsilon
-      
-          def set_epsilon(self, new_value):
-              self._epsilon = new_value
-              self.set_P()
-      
-          epsilon = property(get_epsilon, set_epsilon)
-      
-          def set_P(self): # Command to recognize each senario to use.
-              if self.move == 'sequential':
-                  self.P = KMR_2x2_P_sequential(self.N, self.p, self._epsilon)
-              else:
-                  self.P = KMR_2x2_P_simultaneous(self.N, self.p, self._epsilon)
-                  
-      #Simulation code
-      
-          def simulate(self, T=100000, x0=0):
-             
-            """
-              Generates a NumPy array containing a sample path of length T
-              with initial state x0 = 0
-              
-            """
-              self.s = mc_sample_path(self.P, x0, T)
-      
-          def get_sample_path(self):
-              return self.s
-      
-      #Plot a sample path\n",
-      
-          def plot_sample_path(self, ax=None, show=True):
-              if show:
-                  fig, ax = plt.subplots()
-              ax.plot(self.s, alpha=0.5)
-              ax.set_ylim(0, self.N)
-              ax.set_title(r'Sample path: $\\varepsilon = {0}$'.format(self._epsilon))
-              ax.set_xlabel('time')
-              ax.set_ylabel('state space')
-              if show:
-                  plt.show()
-      
-          def plot_emprical_dist(self, ax=None, show=True):
-              if show:
-                  fig, ax = plt.subplots()
-              hist, bins = np.histogram(self.s, self.N+1)
-              ax.bar(range(self.N+1), hist, align='center')
-              ax.set_title(r'Emprical distribution: $\\varepsilon = {0}$'.format(self._epsilon))
-              ax.set_xlim(-0.5, self.N+0.5)
-              ax.set_xlabel('state space')
-              ax.set_ylabel('frequency')
-              if show:
-                  plt.show()
-      
-      # Compute a stationary distribution\n",
-      
-          def compute_stationary_dist(self):
-              
-             """                               
-              Generates a NumPy array containing the stationary distribution
-             """ 
-              
-              self.mu = mc_compute_stationary(self.P)
-    
-          def get_stationary_dist(self):
-              return self.mu
-      
-          def plot_stationary_dist(self, ax=None, show=True):
-              if show:
-                  fig, ax = plt.subplots()
-              ax.bar(range(self.N+1), self.mu, align='center')
-              ax.set_xlim(-0.5, self.N+0.5)
-              ax.set_ylim(0, 1)
-              ax.set_title(r'Stationary distribution: $\\varepsilon = {0}$'.format(self._epsilon))
-              ax.set_xlabel('state space')
-              ax.set_ylabel('probability')
-              if show:
-                  plt.show()
-      
-      if __name__ == '__main__':
-          p = 1/3
-          N = 10
-          epsilon = 0.03
-          T = 300000
-      
-          kmr = KMR_2x2(N, p, epsilon)
-          kmr.simulate(T)
-          kmr.plot_sample_path()
-    
+{
+ "metadata": {
+  "name": "",
+  "signature": "sha256:026e8710c8e60998a62e73e43474fe40f5a4d8485972c2e5de42d564fe5442fd"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "\n",
+      "from __future__ import division\n",
+      "import numpy as np\n",
+      "from scipy.stats import binom\n",
+      "import matplotlib.pyplot as plt\n",
+      "from mc_tools import mc_compute_stationary, mc_sample_path\n",
+      "\n",
+      "\"\"\" \n",
+      "This file is based on D.Oyama's class file, KMR_2x2.\n",
+      "\n",
+      "\"\"\"\n",
+      "\n",
+      "\n",
+      "\"\"\"\n",
+      "Parameters for KMR game.\n",
+      "\n",
+      "N; number of players.\n",
+      "p; number of threshhold to take an action 1 for best response.\n",
+      "epsilon; probability of random choice (experiment, mutation). \n",
+      "x; number of agents playing action 1.\n",
+      "\"\"\"\n",
+      "\n",
+      "\"\"\"\n",
+      "(1) Simultenious revisions.\n",
+      "\n",
+      "\"\"\"\n",
+      "def KMR_2x2_P_simultaneous(N, p, epsilon):\n",
+      "    P = np.empty((N+1, N+1), dtype=float)\n",
+      "    for x in range(N+1):\n",
+      "      P[x,:]  = \\ # transition probability where current state is x.\n",
+      "            (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + \\\n",
+      "            (x/N == p) * binom.pmf(range(N+1), N, 1/2) + \\      # Each prob.dist affected by current state.\n",
+      "            (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2)\n",
+      "    return P\n",
+      "\n",
+      "\n",
+      "\n",
+      "\n",
+      "\"\"\"\n",
+      "(2) Sequential revisions\n",
+      "I allow each agent to play the game with himself.\n",
+      "\n",
+      "\"\"\"\n",
+      "\n",
+      "def KMR_2x2_P_sequential(N, p, epsilon):\n",
+      "    P = np.zeros((N+1, N+1), dtype=float)\n",
+      "    \n",
+      "    P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) # transition where current state is x=0.\n",
+      "    P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) # transiiton where current state is x=N.\n",
+      "    \n",
+      "    for x in range(1, N):\n",
+      "        P[x, x-1] = \\ # transiton to one decreased state.\n",
+      "            (x/N) * (\n",
+      "                      (x/N >p)*epsilon * (1/2)\n",
+      "                      (x/N == p) * (1/2))\n",
+      "                      (x/N < p)*(1 - epsilon*(1/2))\n",
+      "                     )\n",
+      "        \n",
+      "        P[x, x+1] = \\ #transition to one increased state.\n",
+      "            (1-(x/N)) * (\n",
+      "                          (x/N >p)*(1 - epsilon*(1/2))\n",
+      "                          (x/N == p) * (1/2))\n",
+      "                          (x/N < p)*epsilon * (1/2)\n",
+      "                         )\n",
+      "            \n",
+      "        P[x, x] = 1 - P[x, x-1] - P[x, x+1] #transition to be remained current state.\n",
+      "        \n",
+      "    return P\n",
+      "\n",
+      "\n",
+      "\n",
+      "class KMR_2x2:\n",
+      "# Determine dynamics senario; simultenious or sequential\n",
+      "\n",
+      "    def __init__(self, N, p, epsilon, move='simultaneous'):\n",
+      "        self._epsilon = epsilon\n",
+      "        self.N, self.p, self.move = N, p, move\n",
+      "        self.set_P() # game what to use, simultenious or sequential.\n",
+      "\n",
+      "    def get_epsilon(self):\n",
+      "        return self._epsilon\n",
+      "\n",
+      "    def set_epsilon(self, new_value):\n",
+      "        self._epsilon = new_value\n",
+      "        self.set_P()\n",
+      "\n",
+      "    epsilon = property(get_epsilon, set_epsilon)\n",
+      "\n",
+      "    def set_P(self): # Command to recognize each senario to use.\n",
+      "        if self.move == 'sequential':\n",
+      "            self.P = KMR_2x2_P_sequential(self.N, self.p, self._epsilon)\n",
+      "        else:\n",
+      "            self.P = KMR_2x2_P_simultaneous(self.N, self.p, self._epsilon)\n",
+      "            \n",
+      "#Simulation code\n",
+      "\n",
+      "    def simulate(self, T=100000, x0=0):\n",
+      "        \"\"\"\n",
+      "        Generates a NumPy array containing a sample path of length T\n",
+      "        with initial state x0 = 0\n",
+      "        \"\"\"\n",
+      "        self.s = mc_sample_path(self.P, x0, T)\n",
+      "\n",
+      "    def get_sample_path(self):\n",
+      "        return self.s\n",
+      "    \n",
+      "#Plot a sample path\n",
+      "\n",
+      "    def plot_sample_path(self, ax=None, show=True):\n",
+      "        if show:\n",
+      "            fig, ax = plt.subplots()\n",
+      "        ax.plot(self.s, alpha=0.5)\n",
+      "        ax.set_ylim(0, self.N)\n",
+      "        ax.set_title(r'Sample path: $\\varepsilon = {0}$'.format(self._epsilon))\n",
+      "        ax.set_xlabel('time')\n",
+      "        ax.set_ylabel('state space')\n",
+      "        if show:\n",
+      "            plt.show()\n",
+      "\n",
+      "    def plot_emprical_dist(self, ax=None, show=True):\n",
+      "        if show:\n",
+      "            fig, ax = plt.subplots()\n",
+      "        hist, bins = np.histogram(self.s, self.N+1)\n",
+      "        ax.bar(range(self.N+1), hist, align='center')\n",
+      "        ax.set_title(r'Emprical distribution: $\\varepsilon = {0}$'.format(self._epsilon))\n",
+      "        ax.set_xlim(-0.5, self.N+0.5)\n",
+      "        ax.set_xlabel('state space')\n",
+      "        ax.set_ylabel('frequency')\n",
+      "        if show:\n",
+      "            plt.show()\n",
+      "\n",
+      "# Compute a stationary distribution\n",
+      "\n",
+      "    def compute_stationary_dist(self):\n",
+      "        \"\"\"\n",
+      "        Generates a NumPy array containing the stationary distribution\n",
+      "        \"\"\"\n",
+      "        self.mu = mc_compute_stationary(self.P)\n",
+      "\n",
+      "    def get_stationary_dist(self):\n",
+      "        return self.mu\n",
+      "\n",
+      "    def plot_stationary_dist(self, ax=None, show=True):\n",
+      "        if show:\n",
+      "            fig, ax = plt.subplots()\n",
+      "        ax.bar(range(self.N+1), self.mu, align='center')\n",
+      "        ax.set_xlim(-0.5, self.N+0.5)\n",
+      "        ax.set_ylim(0, 1)\n",
+      "        ax.set_title(r'Stationary distribution: $\\varepsilon = {0}$'.format(self._epsilon))\n",
+      "        ax.set_xlabel('state space')\n",
+      "        ax.set_ylabel('probability')\n",
+      "        if show:\n",
+      "            plt.show()\n",
+      "\n",
+      "\n",
+      "if __name__ == '__main__':\n",
+      "    p = 1/3\n",
+      "    N = 10\n",
+      "    epsilon = 0.03\n",
+      "    T = 300000\n",
+      "\n",
+      "    kmr = KMR_2x2(N, p, epsilon)\n",
+      "    kmr.simulate(T)\n",
+      "    kmr.plot_sample_path()\n"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
