@@ -25,13 +25,12 @@ x; number of agents playing action 1.
 def KMR_2x2_P_simultaneous(N, p, epsilon):
           P = np.empty((N+1, N+1), dtype=float)
           for x in range(N+1):
-            P[x,:]  = \ # transition probability where current state is x.
+            P[x,:]  = \ 
                  (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + \ 
-                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) + \      # Each prob.dist affected by current state.
+                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) + \      
                  (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2)
           return P
-      
-     
+
 """           
 (2) Sequential revisions
 I allow each agent to play the game with himself.
@@ -41,34 +40,36 @@ I allow each agent to play the game with himself.
 def KMR_2x2_P_sequential(N, p, epsilon):
           P = np.zeros((N+1, N+1), dtype=float)
           
-          P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) # transition where current state is x=0.
-          P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) # transiiton where current state is x=N.
-      
+          P[0, 0], P[0, 1] = 1 - epsilon * (1/2), epsilon * (1/2) 
+          P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) 
+  
           for x in range(1, N):
-             P[x, x-1] = \ # transiton to one decreased state.
+             P[x, x-1] = \ 
                   (x/N) * (
                             (x/N >p)*epsilon * (1/2)
                             (x/N == p) * (1/2))
                             (x/N < p)*(1 - epsilon*(1/2))
                            )
               
-              P[x, x+1] = \ #transition to one increased state.
+              P[x, x+1] = \ 
                   (1-(x/N)) * (
                                 (x/N >p)*(1 - epsilon*(1/2))
                                 (x/N == p) * (1/2))
                                 (x/N < p)*epsilon * (1/2)
                                )
                   
-              P[x, x] = 1 - P[x, x-1] - P[x, x+1] #transition to be remained current state.
+              P[x, x] = 1 - P[x, x-1] - P[x, x+1] 
               
           return P
       
+                            
+                            
 class KMR_2x2:
-      # Determine dynamics senario; simultenious or sequential
+      
    def __init__(self, N, p, epsilon, move='simultaneous'):
               self._epsilon = epsilon
               self.N, self.p, self.move = N, p, move
-              self.set_P() # game what to use, simultenious or sequential.
+              self.set_P() 
       
    def get_epsilon(self):
         return self._epsilon
@@ -79,13 +80,13 @@ class KMR_2x2:
       
     epsilon = property(get_epsilon, set_epsilon)
       
-    def set_P(self): # Command to recognize each senario to use.
+    def set_P(self): 
         if self.move == 'sequential':
             self.P = KMR_2x2_P_sequential(self.N, self.p, self._epsilon)
         else:
             self.P = KMR_2x2_P_simultaneous(self.N, self.p, self._epsilon)
                   
-      #Simulation code
+      
       
     def simulate(self, T=100000, x0=0):
              
@@ -99,7 +100,7 @@ class KMR_2x2:
     def get_sample_path(self):
         return self.s
       
-      #Plot a sample path\n",
+      
       
     def plot_sample_path(self, ax=None, show=True):
         if show:
@@ -124,7 +125,7 @@ class KMR_2x2:
         @if show:
                   plt.show()
       
-      # Compute a stationary distribution\n",
+      
       
           def compute_stationary_dist(self):
               
