@@ -25,10 +25,10 @@ x; number of agents playing action 1.
 def KMR_2x2_P_simultaneous(N, p, epsilon):
           P = np.empty((N+1, N+1), dtype=float)
           for x in range(N+1):
-            P[x,:]  = \ 
-                 (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + \ 
-                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) + \      
-                 (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2)
+            P[x,:]  = / 
+                 (x/N < p) * binom.pmf(range(N+1), N, epsilon/2) + / 
+                 (x/N == p) * binom.pmf(range(N+1), N, 1/2) + /      
+                 (x/N > p) * binom.pmf(range(N+1), N, 1-epsilon/2) +/
           return P
 
 """           
@@ -44,14 +44,14 @@ def KMR_2x2_P_sequential(N, p, epsilon):
           P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2) 
   
           for x in range(1, N):
-             P[x, x-1] = \ 
+             P[x, x-1] = / 
                   (x/N) * (
                             (x/N >p)*epsilon * (1/2)
                             (x/N == p) * (1/2))
                             (x/N < p)*(1 - epsilon*(1/2))
                            )
               
-              P[x, x+1] = \ 
+              P[x, x+1] = / 
                   (1-(x/N)) * (
                                 (x/N >p)*(1 - epsilon*(1/2))
                                 (x/N == p) * (1/2))
