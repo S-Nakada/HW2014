@@ -6,10 +6,11 @@ Topics in Economic Theory (2014)
 ### HW3
 [My notebook] (http://nbviewer.ipython.org/github/S-Nakada/HW2014/blob/master/hw_nov19.ipynb)
 
-### HW4(revised,12/1)
+### HW4(revised,12/1. Class file is under construction)
 [My notebook] (http://nbviewer.ipython.org/github/S-Nakada/HW2014/blob/master/hw_nov26.ipynb)
-
-Fixed ealier version's errors. One problem remained is that my class file still doesn't work although I modify the file following Oyama sensei's comments.
 
 ### HW5
 [My notebook] (http://nbviewer.ipython.org/github/S-Nakada/HW2014/blob/master/hw_dec3.ipynb)
+
+### HW6(Policy iteration method is under construction)
+[My notebook] (http://nbviewer.ipython.org/github/S-Nakada/HW2014/blob/master/hw_dec10.ipynb)
